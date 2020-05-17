@@ -11,12 +11,12 @@ function startGame() {
 
   for (var i = 0; i < myGamePiece.length; i++){
     if(i >= myGamePiece.length/2){
-      myGamePiece[i] = new rock(60, 60, "black", 60*(i - myGamePiece.length/2 +1 ), myGameArea.canvas.height*3/4, "black");
+      myGamePiece[i] = new rock(60, 60, "#814c81", 60*(i - myGamePiece.length/2 +1 ), myGameArea.canvas.height*3/4, "black");
       myGamePiece[i].setIndex(i);
       myGamePiece[i].setArea(1);
       continue;
     }
-    myGamePiece[i] = new rock(60, 60, "red", 60*(i+1), myGameArea.canvas.height*1/4, "white");
+    myGamePiece[i] = new rock(60, 60, "#03a9f4", 60*(i+1), myGameArea.canvas.height*1/4, "white");
     myGamePiece[i].setIndex(i);
     myGamePiece[i].setArea(0);
   }
@@ -24,7 +24,7 @@ function startGame() {
     myWall[i] = new rect(i*(myGameArea.canvas.width/2 + 40), myGameArea.canvas.height/2-20, myGameArea.canvas.width/2 + (i == 0 ? -40 :40), 40, "green");
     myWall[i].setIndex(i);
   }
-  //onMovePiece = myGamePiece;
+
   for (var i = 0; i < mySling.length; i++){
     mySling[i] = new sling(
       0,
@@ -33,8 +33,7 @@ function startGame() {
       Math.ceil(myGameArea.canvas.height*(15+i*70)/100));
     mySling[i].setArea(i);
   }
-
-//  myGameArea.autoLaunchInterval = setInterval(autoLaunch,3000);
+  myGameArea.autoLaunchInterval = setInterval(autoLaunch,3000);
 
 }
 var myGameArea = {
@@ -49,21 +48,28 @@ var myGameArea = {
 
         window.addEventListener('resize', windowResize);
         myGameArea.canvas.addEventListener("mousedown", canvasStartMove);
-        myGameArea.canvas.addEventListener("touchstart", canvasStartMove);
+        myGameArea.canvas.addEventListener("touchstart", function(e){
+          canvasStartMove({layerX:e.changedTouches[0].pageX - this.offsetLeft,layerY:e.changedTouches[0].pageY - this.offsetTop});
+        });
 
         myGameArea.canvas.addEventListener("mousemove", function(e){
           pieceOnDrag(isDown, e, onMovePiece);
+        });
+        myGameArea.canvas.addEventListener("touchmove", function(e){
+          pieceOnDrag(isDown, {layerX:e.changedTouches[0].pageX - this.offsetLeft,layerY:e.changedTouches[0].pageY - this.offsetTop}, onMovePiece);
         });
 
         myGameArea.canvas.addEventListener("mouseup", function(e){
           pieceOverDrag(isDown, onMovePiece, tempData, true);
         });
+        myGameArea.canvas.addEventListener("touchend", function(e){
+          pieceOverDrag(isDown, onMovePiece, tempData, true);
+        });
         myGameArea.canvas.addEventListener("mouseout", function(e){
           pieceOverDrag(isDown, onMovePiece, tempData, true);
         });
-        //myGameArea.canvas.addEventListener("touchdown", canvasOverMove);
 
-        this.interval = setInterval(updateGameArea, 10);
+        this.interval = setInterval(updateGameArea, 5);
 
         },
     clear : function() {
@@ -293,17 +299,6 @@ function sling(x1, y1, color, x2, y2){
     ctx.moveTo(x + 150*Math.sin(arrowAngle), y - 150*Math.cos(arrowAngle));
     ctx.lineTo(x,y);
     ctx.stroke();
-    // right
-    /*ctx.beginPath();
-    ctx.rotate(angle*Math.PI/180);
-    ctx.moveTo(100,120);
-    ctx.lineTo(120,100);
-    ctx.lineTo(140,120);
-    ctx.stroke();
-
-    ctx.moveTo(120,100);
-    ctx.lineTo(120,150);
-    ctx.stroke();*/
   }
   this.betweenAngle = () => {
 
@@ -327,7 +322,6 @@ function sling(x1, y1, color, x2, y2){
         this.point.p3.y = this.area == 0 ? y - 5 : y + piece.radius*2;
         this.temp.y = this.point.p3.y;
 
-        //console.log();
       }else
         this.point3Display = false;
 
@@ -343,10 +337,6 @@ function rock(width, height, color, x, y, type) {
     this.radius = 25;
     this.crash = false;
     this.timeOut = false;
-/*this.crashTimeOut = () => {
-      // timeoutu silemiyorsun
-      this.timeOut = window.setTimeout(function(){this.crash = false;this.clearTime(this.timeOut);}, 1000);
-    }*/
     this.clearTime = (param) => {
         clearTimeout(param);
     }
@@ -514,7 +504,7 @@ async function autoLaunch(){
   }
 }
 const autoMove = (velocity, randPiece, point, point3Y,data) => {
-  //const rand = randPiece;
+
     return new Promise((resolve, reject) => {
 
         var intertest = setInterval(function(){
@@ -590,9 +580,9 @@ function rectangleCollision(piece, wall){
         if (wall.index == 0) {
 
           if(Math.abs(Math.floor(angle*180/Math.PI)) <= 45)
-            piece.velocity.x = -piece.velocity.x - (Math.abs(piece.velocity.x) < 5 ? 1:0);
+            piece.velocity.x = -piece.velocity.x;
           else if(Math.abs(Math.floor(angle*180/Math.PI)) > 45)
-            piece.velocity.y = -piece.velocity.y  - (Math.abs(piece.velocity.x) < 5 ? 1:0);
+            piece.velocity.y = -piece.velocity.y;
 
 
         }
@@ -708,11 +698,11 @@ function updateGameArea() {
     item.update();
   });
 
-  /*winner()
+  winner()
   .then(function(winner){
     var div = document.createElement('div');
     div.innerHTML = "KAZANAN " + (winner == 1 ? "SİZSİNİZ":"BİLGİSAYAR") + "<br> Yeni oyuna başlamak için tıklayın"  ;
-    // set style
+
     div.style.background = 'blue';
     div.style.color = 'white';
     div.style.zIndex = 10;
@@ -725,7 +715,7 @@ function updateGameArea() {
     div.style.fontSize = "36px";
     div.style.alignItems = "center";
     div.style.display = "flex";
-    // better to use CSS though - just set class
+
     div.addEventListener('click', function(){
       startGame();
       div.parentNode.removeChild(div);
@@ -739,7 +729,7 @@ function updateGameArea() {
       document.body.appendChild(div);
     }
 
-  });*/
+  });
 
 
 }
