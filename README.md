@@ -1,2 +1,3 @@
 # js-two-d-game
- web-programla-proje-2
+"Fast Sling" game with JavaScript Canvas Element for  Web Programming Lesson
+> Link:http://prusoft.orgfree.com/
