@@ -1,3 +1,6 @@
+- [EN description](#en)  
+- [TR açıklama](#tr)
+
 # FAST SLIGN PUCK / HIZLI SAPAN
 ### PLAY/HEMEN OYNA: 
 
